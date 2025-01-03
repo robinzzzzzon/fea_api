@@ -1,0 +1,25 @@
+{
+  "name": "fea_eng_app",
+  "version": "1.0.0",
+  "description": "Api of the FEA",
+  "main": "index.js",
+  "author": "Ivan Maximov",
+  "license": "ISC",
+  "keywords": [
+    "js",
+    "javascript",
+    "express",
+    "axios",
+    "mongoose"
+  ],
+  "scripts": {
+    "api": "nodemon -q ./api/index.js"
+  },
+  "devDependencies": {
+    "axios": "1.3.3",
+    "cors": "2.8.5",
+    "express": "4.18.2",
+    "mongoose": "6.9.1",
+    "nodemon": "2.0.20"
+  }
+}
