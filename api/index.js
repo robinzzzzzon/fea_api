@@ -4,7 +4,7 @@ const cors = require('cors')
 const Route = require('./Router')
 
 const API_PORT = 3001
-const DB_URL ='mongodb://mongo:27017/fea_test'
+const DB_URL ='mongodb://db:27017/fea_test'
 
 mongoose.set('strictQuery', false)
 
