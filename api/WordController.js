@@ -7,6 +7,7 @@ const InitListModel = mongoose.model('AllWord', InitSchema)
 const StudyListModel = mongoose.model('StudyWord', StudySchema)
 
 module.exports = {
+  // ------- INIT WORDS ---------
   async addNewWord(req, res) {
     try {
       const addedWord = await InitListModel.create(req.body)
@@ -60,6 +61,19 @@ module.exports = {
     }
   },
 
+  async deleteAllInitWords(req, res) {
+    try {
+      const result = await InitListModel.deleteMany({})
+      return res.json({
+        deletedCount: result.deletedCount,
+        acknowledged: result.acknowledged,
+      });
+    } catch (e) {
+      res.status(500).json(e.message)
+    }
+  },
+
+// --------- STUDY WORDS ------------
   async addStudyWord(req, res) {
     try {
       const addedWord = await StudyListModel.create(req.body)
@@ -109,6 +123,18 @@ module.exports = {
     try {
       const deletedWord = await StudyListModel.findByIdAndDelete(req.params.id)
       return res.json(deletedWord)
+    } catch (e) {
+      res.status(500).json(e.message)
+    }
+  },
+
+  async deleteAllStudyWords(req, res) {
+    try {
+      const result = await StudyListModel.deleteMany({})
+      return res.json({
+        deletedCount: result.deletedCount,
+        acknowledged: result.acknowledged,
+      });
     } catch (e) {
       res.status(500).json(e.message)
     }
