@@ -25,13 +25,16 @@ router
 /**
  * STUDY
  * /words/study
+ * /words/study/deck
  * /words/study/:id
  */
 router
   .route('/words/study')
   .get(WordController.getStudyList)
-  .post(WordController.addStudyWord)
+  .post(WordController.addStudyWord) // single adding
   .delete(WordController.deleteAllStudyWords)
+
+router.post('/words/study/deck', WordController.addStudyDeck); // multiple adding
 
 router
   .route(`/words/study/:id${objectId}`)

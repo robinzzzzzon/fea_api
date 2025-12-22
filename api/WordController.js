@@ -83,6 +83,17 @@ module.exports = {
     }
   },
 
+  async addStudyDeck(req, res) {
+    try {
+      const { wordList } = req.body;
+      const studyWords = await StudyListModel.insertMany(wordList, { ordered: false });
+    
+      return res.status(201).json({ added: studyWords.length });
+    } catch (error) {
+      res.status(500).json(e.message)
+    }
+  },
+
   async getStudyList(req, res) {
     let getWords = null
 
