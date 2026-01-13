@@ -1,3 +1,4 @@
+const srs = require('../helpers/srs.js')
 const mongoose = require('mongoose')
 const WordScheme = require('./Word')
 
@@ -76,7 +77,10 @@ module.exports = {
 // --------- STUDY WORDS ------------
   async addStudyWord(req, res) {
     try {
+      req.body.nextShowDate = new Date()
+
       const addedWord = await StudyListModel.create(req.body)
+
       res.json(addedWord)
     } catch (e) {
       res.status(500).json(e.message)
@@ -86,10 +90,15 @@ module.exports = {
   async addStudyDeck(req, res) {
     try {
       const { wordList } = req.body;
-      const studyWords = await StudyListModel.insertMany(wordList, { ordered: false });
+
+      const modifiedWordList = wordList.data.map(el => {
+        return { word: el.word, translate: el.translate, wordType: el.wordType, nextShowDate: new Date() }
+      })
+
+      const studyWords = await StudyListModel.insertMany(modifiedWordList, { ordered: false });
     
       return res.status(201).json({ added: studyWords.length });
-    } catch (error) {
+    } catch (e) {
       res.status(500).json(e.message)
     }
   },
@@ -121,9 +130,10 @@ module.exports = {
 
   async updateStudyWord(req, res) {
     try {
-      const updatedWord = await StudyListModel.findByIdAndUpdate(req.body._id, req.body, {
-        new: true,
-      })
+      const modifiedWord = srs.calculateStudyProgress({ studyWord: req.body, resolution: req.body.resolution })
+
+      const updatedWord = await StudyListModel.findByIdAndUpdate(modifiedWord._id, modifiedWord, { new: true })
+
       return res.json(updatedWord)
     } catch (e) {
       res.status(500).json(e.message)
