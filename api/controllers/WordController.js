@@ -1,6 +1,6 @@
-const srs = require('../helpers/srs.js')
+const srs = require('../../helpers/srs.js')
 const mongoose = require('mongoose')
-const WordScheme = require('./Word')
+const WordScheme = require('../schemes/Word.js')
 
 const InitSchema = new mongoose.Schema(WordScheme.initWord)
 const StudySchema = new mongoose.Schema(WordScheme.studyWord)
