@@ -4,3 +4,4 @@
 /.dockerignore
 reports
 driver-logs
+.env

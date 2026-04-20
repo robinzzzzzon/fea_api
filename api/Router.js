@@ -1,8 +1,8 @@
-const Router = require('express')
-const WordController = require('./controllers/WordController')
-const DeckController = require('./controllers/DeckController')
+const Router = require('express');
+const WordController = require('./controllers/WordController');
+const DeckController = require('./controllers/DeckController');
 
-const router = new Router()
+const router = new Router();
 
 const objectId = '([0-9a-fA-F]{24})';
 
@@ -12,15 +12,15 @@ const objectId = '([0-9a-fA-F]{24})';
  * /deck/init/:id
  */
 router
-  .route(`/decks/init`)
+  .route('/decks/init')
   .get(DeckController.getInitDecks)
-  .post(DeckController.addInitDeck)
+  .post(DeckController.addInitDeck);
 
-router.route(`/decks/init/all`).post(DeckController.addInitDeckList)
+router.route('/decks/init/all').post(DeckController.addInitDeckList);
 
 router
   .route(`/decks/init/:id${objectId}`)
-  .put(DeckController.updateInitDeck)
+  .put(DeckController.updateInitDeck);
 
 /**
  * INIT WORD
@@ -28,16 +28,16 @@ router
  * /words/init/:id
  */
 router
-  .route(`/words/init`)
+  .route('/words/init')
   .get(WordController.getInitList)
   .post(WordController.addNewWord)
-  .delete(WordController.deleteAllInitWords)
+  .delete(WordController.deleteAllInitWords);
 
 router
   .route(`/words/init/:id${objectId}`)
   .get(WordController.getInitWord)
   .put(WordController.updateInitWord)
-  .delete(WordController.deleteInitWord)
+  .delete(WordController.deleteInitWord);
 
 /**
  * STUDY WORD
@@ -49,7 +49,7 @@ router
   .route('/words/study')
   .get(WordController.getStudyList)
   .post(WordController.addStudyWord) // single adding
-  .delete(WordController.deleteAllStudyWords)
+  .delete(WordController.deleteAllStudyWords);
 
 router.post('/words/study/deck', WordController.addStudyDeck); // multiple adding
 
@@ -57,8 +57,8 @@ router
   .route(`/words/study/:id${objectId}`)
   .get(WordController.getStudyWord)
   .put(WordController.updateStudyWord)
-  .delete(WordController.deleteStudyWord)
+  .delete(WordController.deleteStudyWord);
 
 module.exports = {
   router,
-}
+};
