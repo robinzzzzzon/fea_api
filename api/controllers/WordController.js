@@ -1,44 +1,44 @@
-const srs = require('../../helpers/srs.js')
-const mongoose = require('mongoose')
-const WordScheme = require('../schemes/Word.js')
+const srs = require('../../helpers/srs.js');
+const mongoose = require('mongoose');
+const WordScheme = require('../schemes/Word.js');
 
-const InitSchema = new mongoose.Schema(WordScheme.initWord)
-const StudySchema = new mongoose.Schema(WordScheme.studyWord)
-const InitListModel = mongoose.model('AllWord', InitSchema)
-const StudyListModel = mongoose.model('StudyWord', StudySchema)
+const InitSchema = new mongoose.Schema(WordScheme.initWord);
+const StudySchema = new mongoose.Schema(WordScheme.studyWord);
+const InitListModel = mongoose.model('AllWord', InitSchema);
+const StudyListModel = mongoose.model('StudyWord', StudySchema);
 
 module.exports = {
   // ------- INIT WORDS ---------
   async addNewWord(req, res) {
     try {
-      const addedWord = await InitListModel.create(req.body)
-      res.json(addedWord)
+      const addedWord = await InitListModel.create(req.body);
+      res.json(addedWord);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
   async getInitList(req, res) {
-    let getWords = null
+    let getWords = null;
     try {
       if (!req.query) {
-        getWords = await InitListModel.find()
+        getWords = await InitListModel.find();
       } else {
-        getWords = await InitListModel.find(req.query)
+        getWords = await InitListModel.find(req.query);
       }
 
-      return res.json(getWords)
+      return res.json(getWords);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
   async getInitWord(req, res) {
     try {
-      const getWord = InitListModel.findById(req.params.id)
-      return res.json(getWord)
+      const getWord = await InitListModel.findById(req.params.id);
+      return res.json(getWord);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
@@ -46,44 +46,44 @@ module.exports = {
     try {
       const updatedWord = await InitListModel.findByIdAndUpdate(req.body._id, req.body, {
         new: true,
-      })
-      return res.json(updatedWord)
+      });
+      return res.json(updatedWord);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
   async deleteInitWord(req, res) {
     try {
-      const deletedWord = await InitListModel.findByIdAndDelete(req.params.id)
-      return res.json(deletedWord)
+      const deletedWord = await InitListModel.findByIdAndDelete(req.params.id);
+      return res.json(deletedWord);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
   async deleteAllInitWords(req, res) {
     try {
-      const result = await InitListModel.deleteMany({})
+      const result = await InitListModel.deleteMany({});
       return res.json({
         deletedCount: result.deletedCount,
         acknowledged: result.acknowledged,
       });
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
-// --------- STUDY WORDS ------------
+  // --------- STUDY WORDS ------------
   async addStudyWord(req, res) {
     try {
-      req.body.nextShowDate = new Date()
+      req.body.nextShowDate = new Date();
 
-      const addedWord = await StudyListModel.create(req.body)
+      const addedWord = await StudyListModel.create(req.body);
 
-      res.json(addedWord)
+      res.json(addedWord);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
@@ -92,72 +92,72 @@ module.exports = {
       const { wordList } = req.body;
 
       const modifiedWordList = wordList.data.map(el => {
-        return { word: el.word, translate: el.translate, wordType: el.wordType, nextShowDate: new Date() }
-      })
+        return { word: el.word, translate: el.translate, wordType: el.wordType, nextShowDate: new Date() };
+      });
 
       const studyWords = await StudyListModel.insertMany(modifiedWordList, { ordered: false });
     
       return res.status(201).json({ added: studyWords.length });
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
   async getStudyList(req, res) {
-    let getWords = null
+    let getWords = null;
 
     try {
       if (!req.query) {
-        getWords = await StudyListModel.find()
+        getWords = await StudyListModel.find();
       } else {
-        getWords = await StudyListModel.find(req.query)
+        getWords = await StudyListModel.find(req.query);
       }
 
-      return res.json(getWords)
+      return res.json(getWords);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
   async getStudyWord(req, res) {
     try {
-      const getWord = await StudyListModel.findById(req.params.id)
-      return res.json(getWord)
+      const getWord = await StudyListModel.findById(req.params.id);
+      return res.json(getWord);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
   async updateStudyWord(req, res) {
     try {
-      const modifiedWord = srs.calculateStudyProgress({ studyWord: req.body, resolution: req.body.resolution })
+      const modifiedWord = srs.calculateStudyProgress({ studyWord: req.body, resolution: req.body.resolution });
 
-      const updatedWord = await StudyListModel.findByIdAndUpdate(modifiedWord._id, modifiedWord, { new: true })
+      const updatedWord = await StudyListModel.findByIdAndUpdate(modifiedWord._id, modifiedWord, { new: true });
 
-      return res.json(updatedWord)
+      return res.json(updatedWord);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
   async deleteStudyWord(req, res) {
     try {
-      const deletedWord = await StudyListModel.findByIdAndDelete(req.params.id)
-      return res.json(deletedWord)
+      const deletedWord = await StudyListModel.findByIdAndDelete(req.params.id);
+      return res.json(deletedWord);
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
 
   async deleteAllStudyWords(req, res) {
     try {
-      const result = await StudyListModel.deleteMany({})
+      const result = await StudyListModel.deleteMany({});
       return res.json({
         deletedCount: result.deletedCount,
         acknowledged: result.acknowledged,
       });
     } catch (e) {
-      res.status(500).json(e.message)
+      res.status(500).json(e.message);
     }
   },
-}
+};
