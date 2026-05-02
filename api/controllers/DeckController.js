@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const DeckScheme = require('../schemes/Deck.js');
+const respond = require('../helpers/respond.js');
 
 const InitDeckSchema = new mongoose.Schema(DeckScheme.initDeck);
 const InitDeckListModel = mongoose.model('InitDeck', InitDeckSchema);
@@ -9,9 +10,9 @@ module.exports = {
   async addInitDeck(req, res) {
     try {
       const addedDeck = await InitDeckListModel.create(req.body);
-      res.json(addedDeck);
-    } catch (e) {
-      res.status(500).json(e.message);
+      return respond.created(res, addedDeck);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
@@ -19,30 +20,27 @@ module.exports = {
     try {
       const { deckList } = req.body;
 
-      const modifiedDeckList = deckList.map(el => { 
-        return { dataName: el.dataName, color: el.color };
+      const modifiedDeckList = deckList.map(el => {
+        return { dataName: el.dataName, tone: el.tone };
       });
 
       const initDecks = await InitDeckListModel.insertMany(modifiedDeckList, { ordered: false });
-    
-      return res.status(201).json({ added: initDecks.length });
-    } catch (e) {
-      res.status(500).json(e.message);
+
+      return respond.created(res, { added: initDecks.length });
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
   async getInitDecks(req, res) {
-    let getDecks = null;
     try {
-      if (!req.query) {
-        getDecks = await InitDeckListModel.find();
-      } else {
-        getDecks = await InitDeckListModel.find(req.query);
-      }
+      const getDecks = req.query
+        ? await InitDeckListModel.find(req.query)
+        : await InitDeckListModel.find();
 
-      return res.json(getDecks);
-    } catch (e) {
-      res.status(500).json(e.message);
+      return respond.ok(res, getDecks);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
@@ -51,9 +49,12 @@ module.exports = {
       const updatedDeck = await InitDeckListModel.findByIdAndUpdate(req.body._id, req.body, {
         new: true,
       });
-      return res.json(updatedDeck);
-    } catch (e) {
-      res.status(500).json(e.message);
+
+      if (!updatedDeck) return respond.notFound(res, 'Deck not found');
+
+      return respond.ok(res, updatedDeck);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 };
