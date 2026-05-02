@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "api": "nodemon -q ./api/index.js",
-    "lint": "eslint api/ helpers/"
+    "lint": "eslint api/"
   },
   "dependencies": {
     "cors": "2.8.5",

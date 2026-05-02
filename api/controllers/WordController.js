@@ -1,6 +1,7 @@
-const srs = require('../../helpers/srs.js');
 const mongoose = require('mongoose');
 const WordScheme = require('../schemes/Word.js');
+const srs = require('../helpers/srs.js');
+const respond = require('../helpers/respond.js');
 
 const InitSchema = new mongoose.Schema(WordScheme.initWord);
 const StudySchema = new mongoose.Schema(WordScheme.studyWord);
@@ -12,33 +13,33 @@ module.exports = {
   async addNewWord(req, res) {
     try {
       const addedWord = await InitListModel.create(req.body);
-      res.json(addedWord);
-    } catch (e) {
-      res.status(500).json(e.message);
+      return respond.created(res, addedWord);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
   async getInitList(req, res) {
-    let getWords = null;
     try {
-      if (!req.query) {
-        getWords = await InitListModel.find();
-      } else {
-        getWords = await InitListModel.find(req.query);
-      }
+      const getWords = req.query
+        ? await InitListModel.find(req.query)
+        : await InitListModel.find();
 
-      return res.json(getWords);
-    } catch (e) {
-      res.status(500).json(e.message);
+      return respond.ok(res, getWords);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
   async getInitWord(req, res) {
     try {
       const getWord = await InitListModel.findById(req.params.id);
-      return res.json(getWord);
-    } catch (e) {
-      res.status(500).json(e.message);
+
+      if (!getWord) return respond.notFound(res, 'Word not found');
+
+      return respond.ok(res, getWord);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
@@ -47,30 +48,37 @@ module.exports = {
       const updatedWord = await InitListModel.findByIdAndUpdate(req.body._id, req.body, {
         new: true,
       });
-      return res.json(updatedWord);
-    } catch (e) {
-      res.status(500).json(e.message);
+
+      if (!updatedWord) return respond.notFound(res, 'Word not found');
+
+      return respond.ok(res, updatedWord);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
   async deleteInitWord(req, res) {
     try {
       const deletedWord = await InitListModel.findByIdAndDelete(req.params.id);
-      return res.json(deletedWord);
-    } catch (e) {
-      res.status(500).json(e.message);
+
+      if (!deletedWord) return respond.notFound(res, 'Word not found');
+
+      return respond.ok(res, deletedWord);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
   async deleteAllInitWords(req, res) {
     try {
       const result = await InitListModel.deleteMany({});
-      return res.json({
+
+      return respond.ok(res, {
         deletedCount: result.deletedCount,
         acknowledged: result.acknowledged,
       });
-    } catch (e) {
-      res.status(500).json(e.message);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
@@ -81,9 +89,9 @@ module.exports = {
 
       const addedWord = await StudyListModel.create(req.body);
 
-      res.json(addedWord);
-    } catch (e) {
-      res.status(500).json(e.message);
+      return respond.created(res, addedWord);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
@@ -96,35 +104,34 @@ module.exports = {
       });
 
       const studyWords = await StudyListModel.insertMany(modifiedWordList, { ordered: false });
-    
-      return res.status(201).json({ added: studyWords.length });
-    } catch (e) {
-      res.status(500).json(e.message);
+
+      return respond.created(res, { added: studyWords.length });
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
   async getStudyList(req, res) {
-    let getWords = null;
-
     try {
-      if (!req.query) {
-        getWords = await StudyListModel.find();
-      } else {
-        getWords = await StudyListModel.find(req.query);
-      }
+      const getWords = req.query
+        ? await StudyListModel.find(req.query)
+        : await StudyListModel.find();
 
-      return res.json(getWords);
-    } catch (e) {
-      res.status(500).json(e.message);
+      return respond.ok(res, getWords);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
   async getStudyWord(req, res) {
     try {
       const getWord = await StudyListModel.findById(req.params.id);
-      return res.json(getWord);
-    } catch (e) {
-      res.status(500).json(e.message);
+
+      if (!getWord) return respond.notFound(res, 'Study word not found');
+
+      return respond.ok(res, getWord);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
@@ -134,30 +141,36 @@ module.exports = {
 
       const updatedWord = await StudyListModel.findByIdAndUpdate(modifiedWord._id, modifiedWord, { new: true });
 
-      return res.json(updatedWord);
-    } catch (e) {
-      res.status(500).json(e.message);
+      if (!updatedWord) return respond.notFound(res, 'Study word not found');
+
+      return respond.ok(res, updatedWord);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
   async deleteStudyWord(req, res) {
     try {
       const deletedWord = await StudyListModel.findByIdAndDelete(req.params.id);
-      return res.json(deletedWord);
-    } catch (e) {
-      res.status(500).json(e.message);
+
+      if (!deletedWord) return respond.notFound(res, 'Study word not found');
+
+      return respond.ok(res, deletedWord);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 
   async deleteAllStudyWords(req, res) {
     try {
       const result = await StudyListModel.deleteMany({});
-      return res.json({
+
+      return respond.ok(res, {
         deletedCount: result.deletedCount,
         acknowledged: result.acknowledged,
       });
-    } catch (e) {
-      res.status(500).json(e.message);
+    } catch (error) {
+      return respond.handleError(res, error);
     }
   },
 };
