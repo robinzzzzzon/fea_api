@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const WordScheme = require('../schemes/Word.js');
 const srs = require('../helpers/srs.js');
 const respond = require('../helpers/respond.js');
+const { sanitizeQuery } = require('../helpers/sanitizeQuery.js');
 
 const InitSchema = new mongoose.Schema(WordScheme.initWord);
 const StudySchema = new mongoose.Schema(WordScheme.studyWord);
@@ -21,9 +22,8 @@ module.exports = {
 
   async getInitList(req, res) {
     try {
-      const getWords = req.query
-        ? await InitListModel.find(req.query)
-        : await InitListModel.find();
+      const filter = sanitizeQuery(req.query, ['word', 'wordType']);
+      const getWords = await InitListModel.find(filter);
 
       return respond.ok(res, getWords);
     } catch (error) {
@@ -47,6 +47,7 @@ module.exports = {
     try {
       const updatedWord = await InitListModel.findByIdAndUpdate(req.body._id, req.body, {
         new: true,
+        runValidators: true,
       });
 
       if (!updatedWord) return respond.notFound(res, 'Word not found');
@@ -103,7 +104,7 @@ module.exports = {
         return { word: el.word, translate: el.translate, wordType: el.wordType, nextShowDate: new Date() };
       });
 
-      const studyWords = await StudyListModel.insertMany(modifiedWordList, { ordered: false });
+      const studyWords = await StudyListModel.insertMany(modifiedWordList);
 
       return respond.created(res, { added: studyWords.length });
     } catch (error) {
@@ -113,9 +114,8 @@ module.exports = {
 
   async getStudyList(req, res) {
     try {
-      const getWords = req.query
-        ? await StudyListModel.find(req.query)
-        : await StudyListModel.find();
+      const filter = sanitizeQuery(req.query, ['word', 'wordType']);
+      const getWords = await StudyListModel.find(filter);
 
       return respond.ok(res, getWords);
     } catch (error) {
@@ -139,7 +139,7 @@ module.exports = {
     try {
       const modifiedWord = srs.calculateStudyProgress({ studyWord: req.body, resolution: req.body.resolution });
 
-      const updatedWord = await StudyListModel.findByIdAndUpdate(modifiedWord._id, modifiedWord, { new: true });
+      const updatedWord = await StudyListModel.findByIdAndUpdate(modifiedWord._id, modifiedWord, { new: true, runValidators: true });
 
       if (!updatedWord) return respond.notFound(res, 'Study word not found');
 
