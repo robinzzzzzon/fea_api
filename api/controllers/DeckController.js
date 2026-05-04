@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const DeckScheme = require('../schemes/Deck.js');
 const respond = require('../helpers/respond.js');
+const { sanitizeQuery } = require('../helpers/sanitizeQuery.js');
 
 const InitDeckSchema = new mongoose.Schema(DeckScheme.initDeck);
 const InitDeckListModel = mongoose.model('InitDeck', InitDeckSchema);
@@ -24,7 +25,7 @@ module.exports = {
         return { dataName: el.dataName, tone: el.tone };
       });
 
-      const initDecks = await InitDeckListModel.insertMany(modifiedDeckList, { ordered: false });
+      const initDecks = await InitDeckListModel.insertMany(modifiedDeckList);
 
       return respond.created(res, { added: initDecks.length });
     } catch (error) {
@@ -34,9 +35,8 @@ module.exports = {
 
   async getInitDecks(req, res) {
     try {
-      const getDecks = req.query
-        ? await InitDeckListModel.find(req.query)
-        : await InitDeckListModel.find();
+      const filter = sanitizeQuery(req.query, ['dataName']);
+      const getDecks = await InitDeckListModel.find(filter);
 
       return respond.ok(res, getDecks);
     } catch (error) {
@@ -48,6 +48,7 @@ module.exports = {
     try {
       const updatedDeck = await InitDeckListModel.findByIdAndUpdate(req.body._id, req.body, {
         new: true,
+        runValidators: true,
       });
 
       if (!updatedDeck) return respond.notFound(res, 'Deck not found');
