@@ -19,7 +19,7 @@ const corsOptions = CORS_ORIGIN === '*'
   : { origin: CORS_ORIGIN.split(',').map((origin) => origin.trim()) };
 
 api.use(cors(corsOptions));
-api.use(express.json());
+api.use(express.json({ limit: '5mb' }));
 api.use('/api', Route.router);
 
 async function connectDb() {
