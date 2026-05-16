@@ -22,7 +22,7 @@ module.exports = {
 
   async getInitList(req, res) {
     try {
-      const filter = sanitizeQuery(req.query, ['word', 'wordType']);
+      const filter = sanitizeQuery(req.query, ['word', 'wordType', 'wordCategory']);
       const getWords = await InitListModel.find(filter);
 
       return respond.ok(res, getWords);
@@ -101,7 +101,7 @@ module.exports = {
       const { wordList } = req.body;
 
       const modifiedWordList = wordList.data.map(el => {
-        return { word: el.word, translate: el.translate, wordType: el.wordType, nextShowDate: new Date() };
+        return { word: el.word, translate: el.translate, wordType: el.wordType, wordCategory: el.wordCategory, nextShowDate: new Date() };
       });
 
       const studyWords = await StudyListModel.insertMany(modifiedWordList);
@@ -114,7 +114,7 @@ module.exports = {
 
   async getStudyList(req, res) {
     try {
-      const filter = sanitizeQuery(req.query, ['word', 'wordType']);
+      const filter = sanitizeQuery(req.query, ['word', 'wordType', 'wordCategory']);
       const getWords = await StudyListModel.find(filter);
 
       return respond.ok(res, getWords);
